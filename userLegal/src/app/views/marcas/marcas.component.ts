@@ -10,7 +10,7 @@ import { AngularFireStorage } from '@angular/fire/compat/storage';
   selector: 'app-marcas',
   templateUrl: './marcas.component.html',
   styleUrls: ['./marcas.component.scss'],
-  standalone: true,
+
   imports: [IonModal, CommonModule, FormsModule, ReactiveFormsModule],
 })
 export class MarcasPage implements OnInit {
