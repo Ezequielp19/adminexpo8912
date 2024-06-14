@@ -1,36 +1,33 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { LoadingController, AlertController } from '@ionic/angular';
 import { FirestoreService } from '../../common/services/firestore.service';
 import { Marca } from '../../common/models/marca.model';
-import { AlertController, LoadingController, IonModal } from '@ionic/angular';
-import { Observable } from 'rxjs';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { AngularFireStorage } from '@angular/fire/compat/storage';
 
 @Component({
   selector: 'app-marcas',
   templateUrl: './marcas.component.html',
   styleUrls: ['./marcas.component.scss'],
-
-  imports: [IonModal, CommonModule, FormsModule, ReactiveFormsModule],
 })
 export class MarcasPage implements OnInit {
   marcas: Marca[] = [];
-  nuevaMarca: Marca = { nombre: '', imagen: '' };
   imagenMarca: File | null = null;
-  isModalOpen = false;
-
+  isModalOpen: boolean = false;
+  editMode: boolean = false;
   marcaForm: FormGroup;
+
+  marcaAEditar: Marca | null = null;
 
   constructor(
     private firestoreService: FirestoreService,
     private alertController: AlertController,
     private fb: FormBuilder,
-    private loadingController: LoadingController,
-    private storage: AngularFireStorage
+    private loadingController: LoadingController
   ) {
     this.marcaForm = this.fb.group({
+      id: [''],
       nombre: ['', Validators.required],
-      imagen: ['', Validators.required]
+      imagen: ['']
     });
   }
 
@@ -38,26 +35,17 @@ export class MarcasPage implements OnInit {
     this.cargarMarcas();
   }
 
-  onWillDismiss(event: Event) {
-    const ev = event as CustomEvent<OverlayEventDetail<string>>;
-    if (ev.detail.role === 'confirm') {
-      this.agregarMarca();
-    }
-  }
-
   async cargarMarcas() {
     this.marcas = await this.firestoreService.getMarcas();
+    console.log('Marcas obtenidas:', this.marcas);
   }
 
-  onFileSelected(event: any) {
-    this.imagenMarca = event.target.files[0];
-  }
-
-  async agregarMarca() {
-    if (this.marcaForm.invalid || !this.imagenMarca) {
-      this.showErrorAlert('Por favor, completa todos los campos y selecciona una imagen.');
+  async agregarOEditarMarca() {
+    if (this.marcaForm.invalid) {
       return;
     }
+
+    const marcaData = this.marcaForm.value;
 
     const loading = await this.loadingController.create({
       message: 'Guardando...',
@@ -65,18 +53,13 @@ export class MarcasPage implements OnInit {
     await loading.present();
 
     try {
-      const marcaData = this.marcaForm.value;
-      
-      // Subir la imagen a Firebase Storage
-      const filePath = `marcas/${this.imagenMarca.name}`;
-      const fileRef = this.storage.ref(filePath);
-      const task = this.storage.upload(filePath, this.imagenMarca);
-      await task;
-      const downloadURL = await fileRef.getDownloadURL().toPromise();
-
-      marcaData.imagen = downloadURL; // Asignar la URL de la imagen a marcaData
-      await this.firestoreService.addMarca(marcaData);
-      this.showSuccessAlert('Marca agregada con éxito.');
+      if (this.editMode && this.marcaAEditar) {
+        marcaData.id = this.marcaAEditar.id;
+        await this.firestoreService.updateMarca(marcaData, this.imagenMarca);
+      } else {
+        await this.firestoreService.addMarca(marcaData, this.imagenMarca);
+      }
+      this.showSuccessAlert('Marca guardada con éxito.');
     } catch (error) {
       console.error('Error al guardar la marca:', error);
       this.showErrorAlert('Error al guardar la marca. Por favor, inténtalo de nuevo.');
@@ -87,17 +70,12 @@ export class MarcasPage implements OnInit {
     }
   }
 
-  openModal() {
-    this.isModalOpen = true;
-    this.marcaForm.reset();
-  }
-
-  closeModal() {
-    this.isModalOpen = false;
-    this.imagenMarca = null; // Limpia la selección de imagen al cerrar el modal
-  }
-
   async eliminarMarca(marca: Marca) {
+    if (!marca || !marca.id) {
+      console.error('Marca inválida o sin ID.');
+      return;
+    }
+
     const alert = await this.alertController.create({
       header: 'Confirmar Eliminación',
       message: `¿Estás seguro de que quieres eliminar la marca "${marca.nombre}"? Esta acción no se puede deshacer.`,
@@ -109,13 +87,22 @@ export class MarcasPage implements OnInit {
         {
           text: 'Eliminar',
           handler: async () => {
+            const loading = await this.loadingController.create({
+              message: 'Eliminando...',
+            });
+            await loading.present();
+
             try {
               await this.firestoreService.deleteMarca(marca);
               this.marcas = this.marcas.filter(m => m.id !== marca.id);
+              console.log(`Marca eliminada: ${marca.id}`);
               this.showSuccessAlert('La marca se ha eliminado con éxito.');
+              this.cargarMarcas();
             } catch (error) {
               console.error('Error eliminando la marca:', error);
               this.showErrorAlert('Error al eliminar la marca. Por favor, inténtalo de nuevo.');
+            } finally {
+              await loading.dismiss();
             }
           },
         },
@@ -142,5 +129,23 @@ export class MarcasPage implements OnInit {
     });
     await alert.present();
   }
-}
 
+  openModal() {
+    this.isModalOpen = true;
+    this.editMode = false;
+    this.marcaForm.reset();
+  }
+
+  closeModal() {
+    this.isModalOpen = false;
+    this.imagenMarca = null;
+  }
+
+  onFileSelected(event: any) {
+    this.imagenMarca = event.target.files[0];
+  }
+
+  onWillDismiss(event: Event) {
+    // Si necesitas manejar algo al cerrar el modal, puedes hacerlo aquí
+  }
+}
