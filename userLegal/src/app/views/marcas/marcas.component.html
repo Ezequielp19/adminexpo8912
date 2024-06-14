@@ -1,61 +1,63 @@
-<ion-header>
-  <ion-toolbar color="primary">
-    <ion-title>Marcas</ion-title>
-    <ion-buttons slot="end">
-      <ion-button (click)="openModal()">
-        <ion-icon name="add"></ion-icon>
+<!-- Cabecera -->
+<header>
+  <div class="toolbar" [ngClass]="{ 'primary': true }">
+    <h1 class="title">Marcas</h1>
+    <div class="end">
+      <button class="add-button" (click)="openModal()">
+        <i class="icon-add"></i>
         Agregar
-      </ion-button>
-    </ion-buttons>
-  </ion-toolbar>
-</ion-header>
+      </button>
+    </div>
+  </div>
+</header>
 
-<ion-content>
-  <ion-grid fixed>
-    <ion-row>
-      <ion-col size="2">Nombre</ion-col>
-      <ion-col size="2">Imagen</ion-col>
-      <ion-col size="2">Acciones</ion-col>
-    </ion-row>
+<!-- Contenido -->
+<main>
+  <div class="grid">
+    <div class="row header">
+      <div class="col">Nombre</div>
+      <div class="col">Imagen</div>
+      <div class="col">Acciones</div>
+    </div>
 
-    <ion-row *ngFor="let marca of marcas">
-      <ion-col size="2">{{ marca.nombre }}</ion-col>
+    <div class="row" *ngFor="let marca of marcas">
+      <div class="col">{{ marca.nombre }}</div>
 
-      <ion-col size="2">
-        <img *ngIf="marca.imagen" [src]="marca.imagen" alt="Imagen de {{ marca.nombre }}" style="width: 50px; height: 50px;" />
-      </ion-col>
+      <div class="col">
+        <img *ngIf="marca.imagen" [src]="marca.imagen" [alt]="'Imagen de ' + marca.nombre" class="brand-image">
+      </div>
 
-      <ion-col size="2">
-        <ion-button color="danger" fill="outline" (click)="eliminarMarca(marca)">Eliminar</ion-button>
-      </ion-col>
-    </ion-row>
-  </ion-grid>
+      <div class="col">
+        <button class="delete-button" (click)="eliminarMarca(marca)">Eliminar</button>
+      </div>
+    </div>
+  </div>
 
   <!-- Modal para agregar/editar marca -->
-  <ion-modal [isOpen]="isModalOpen">
-    <ion-header>
-      <ion-toolbar>
-        <ion-title>{{ editMode ? 'Editar Marca' : 'Agregar Marca' }}</ion-title>
-        <ion-buttons slot="end">
-          <ion-button (click)="closeModal()">Cerrar</ion-button>
-        </ion-buttons>
-      </ion-toolbar>
-    </ion-header>
+  <div class="modal" *ngIf="isModalOpen">
+    <header>
+      <div class="toolbar">
+        <h1 class="title">{{ editMode ? 'Editar Marca' : 'Agregar Marca' }}</h1>
+        <div class="end">
+          <button class="close-button" (click)="closeModal()">Cerrar</button>
+        </div>
+      </div>
+    </header>
 
-    <ion-content>
+    <section>
       <form [formGroup]="marcaForm" (ngSubmit)="agregarOEditarMarca()">
-        <ion-item>
-          <ion-label position="stacked">Nombre</ion-label>
-          <ion-input formControlName="nombre"></ion-input>
-        </ion-item>
+        <div class="form-item">
+          <label>Nombre</label>
+          <input type="text" formControlName="nombre">
+        </div>
 
-        <ion-item>
-          <ion-label position="stacked">Imagen</ion-label>
+        <div class="form-item">
+          <label>Imagen</label>
           <input type="file" (change)="onFileSelected($event)">
-        </ion-item>
+        </div>
 
-        <ion-button expand="full" type="submit">{{ editMode ? 'Actualizar' : 'Agregar' }}</ion-button>
+        <button class="submit-button" type="submit">{{ editMode ? 'Actualizar' : 'Agregar' }}</button>
       </form>
-    </ion-content>
-  </ion-modal>
-</ion-content>
+    </section>
+  </div>
+</main>
