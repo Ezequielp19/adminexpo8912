@@ -1,0 +1,27 @@
+ion-content {
+  .product-list {
+    margin: 0;
+    padding: 0;
+  }
+
+  ion-grid {
+    width: 100%;
+    max-width: 100%;
+    margin: auto;
+    overflow-x: auto;
+
+    ion-row {
+      display: flex;
+      align-items: center;
+      border-bottom: 1px solid #ddd;
+
+      ion-col {
+        padding: 10px;
+        text-align: center;
+        &:first-of-type {
+          text-align: left;
+        }
+      }
+    }
+  }
+}

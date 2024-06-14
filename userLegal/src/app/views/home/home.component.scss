@@ -1,0 +1,7 @@
+.welcome-section {
+  display: flex;
+  flex-direction: column; /* Apila los elementos en vertical */
+  align-items: center;   /* Centra los elementos horizontalmente */
+  justify-content: center; /* Centra los elementos verticalmente */
+  height: 60%;            /* Asegúrate de que ocupe toda la altura del contenedor */
+}

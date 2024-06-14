@@ -1,0 +1,47 @@
+<ion-app>
+  <ion-header>
+    <ion-toolbar color="primary">
+      <ion-title style="justify-content: center;" >Administrador de ExpoTools</ion-title>
+    </ion-toolbar>
+  </ion-header>
+
+  <ion-content class="ion-padding">
+
+    <div class="welcome-section">
+      <h2>¡Bienvenido al administrador de ExpoTools!</h2>
+      <div *ngIf="clima" class="weather-info">
+        <img [src]="clima.current.condition.icon" alt="Icono del clima">
+        <p>
+          {{ clima.location.name }}, {{ clima.location.country }} |
+          {{ clima.current.temp_c }}°C |
+          {{ clima.current.condition.text }}
+        </p>
+      </div>
+      <div *ngIf="errorMensaje" class="error-message">
+        <p>{{ errorMensaje }}</p>
+      </div>
+    </div>
+
+    <div class="button-section">
+      <ion-button expand="full" routerLink="/productos">
+        <ion-icon name="cube-outline" slot="start"></ion-icon>
+        Productos
+      </ion-button>
+
+      <ion-button expand="full" routerLink="/etiquetas">
+        <ion-icon name="pricetags-outline" slot="start"></ion-icon>
+        Gestionar Etiquetas
+      </ion-button>
+
+      <ion-button expand="full" routerLink="/categoria">
+        <ion-icon name="layers-outline" slot="start"></ion-icon>
+        Categorias
+      </ion-button>
+
+      <ion-button expand="full" routerLink="/marcas">
+        <ion-icon name="settings-outline" slot="start"></ion-icon>
+        Marca
+      </ion-button>
+    </div>
+  </ion-content>
+</ion-app>

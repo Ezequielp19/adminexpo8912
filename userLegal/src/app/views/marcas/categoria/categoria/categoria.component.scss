@@ -1,0 +1,55 @@
+ion-content {
+  .category-list {
+    margin: 0;
+    padding: 0;
+  }
+
+  ion-grid {
+    width: 100%;
+    max-width: 100%;
+    margin: auto;
+    overflow-x: auto;
+
+    ion-row {
+      display: flex;
+      align-items: center;
+      border-bottom: 1px solid #ddd;
+
+      ion-col {
+        padding: 10px;
+        text-align: center;
+        &:first-of-type {
+          text-align: left;
+        }
+      }
+    }
+  }
+}
+
+ion-card {
+  border-radius: 10px; // Bordes redondeados
+  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1); // Sombras sutiles
+}
+
+ion-card-header {
+  padding: 16px; // Más espacio interno
+}
+
+ion-card-title {
+  font-size: 1.2em; // Título más grande
+  font-weight: 600;  // Título más grueso
+}
+
+ion-grid {
+  padding: 16px; // Espacio entre las cards
+}
+
+.categoria-card img {
+  max-height: 200px; // Altura máxima para la imagen
+  object-fit: cover;  // Ajusta la imagen sin deformarla
+  border-radius: 10px 10px 0 0; // Bordes redondeados en la parte superior
+}
+
+ion-toolbar {
+  --background: #CFB53B; // Color azul similar a MarcasPage (ajusta si es diferente)
+}
