@@ -148,7 +148,6 @@ marcaAEditar: Marca | null = null;
     try {
       if (this.editMode && this.marcaAEditar) {
         marcaData.id = this.marcaAEditar.id;
-        await this.FirestoreService.updateMarca(marcaData, this.imagenMarca);
       } else {
         await this.FirestoreService.addMarca(marcaData, this.imagenMarca);
       }
