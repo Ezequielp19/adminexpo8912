@@ -31,13 +31,17 @@ export class MarcasPage implements OnInit {
     });
   }
 
-  async ngOnInit() {
+  ngOnInit() {
     this.cargarMarcas();
   }
 
   async cargarMarcas() {
-    this.marcas = await this.firestoreService.getMarcas();
-    console.log('Marcas obtenidas:', this.marcas);
+    try {
+      this.marcas = await this.firestoreService.getMarcas();
+      console.log('Marcas obtenidas:', this.marcas);
+    } catch (error) {
+      console.error('Error obteniendo marcas:', error);
+    }
   }
 
   async agregarOEditarMarca() {
@@ -60,13 +64,13 @@ export class MarcasPage implements OnInit {
         await this.firestoreService.addMarca(marcaData, this.imagenMarca);
       }
       this.showSuccessAlert('Marca guardada con éxito.');
+      this.cargarMarcas();
     } catch (error) {
       console.error('Error al guardar la marca:', error);
       this.showErrorAlert('Error al guardar la marca. Por favor, inténtalo de nuevo.');
     } finally {
       await loading.dismiss();
       this.closeModal();
-      this.cargarMarcas();
     }
   }
 
@@ -97,7 +101,6 @@ export class MarcasPage implements OnInit {
               this.marcas = this.marcas.filter(m => m.id !== marca.id);
               console.log(`Marca eliminada: ${marca.id}`);
               this.showSuccessAlert('La marca se ha eliminado con éxito.');
-              this.cargarMarcas();
             } catch (error) {
               console.error('Error eliminando la marca:', error);
               this.showErrorAlert('Error al eliminar la marca. Por favor, inténtalo de nuevo.');
@@ -143,9 +146,5 @@ export class MarcasPage implements OnInit {
 
   onFileSelected(event: any) {
     this.imagenMarca = event.target.files[0];
-  }
-
-  onWillDismiss(event: Event) {
-    // Si necesitas manejar algo al cerrar el modal, puedes hacerlo aquí
   }
 }
